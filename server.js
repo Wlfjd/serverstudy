@@ -31,6 +31,12 @@ app.get('/news',(require,response)=>{
     db.collection('post').insertOne({title:'가나다'})
     // response.send('sunny day')
 })
-app.get('/shop',(require,response)=>{
+app.get('/list', async(require,response)=>{
+    // db.collection은 실행이 오래걸리는 코드라 기다려야 함 
+    //만약 비동기로 하지 않는다면 실행이 되기도 전에 다음 줄 출력
+    // await 또는 .then(()=>{}) 사용
+    let result= await db.collection('post').find().toArray() //모든 결과 출력하기
+    //서버에서 console.log 쓰면 터미널에 출력된다
+    console.log(result)
     response.send('shopping page')
 })
