@@ -2,7 +2,10 @@
 const express = require('express')
 const app=express()
 
-app.use(express.static(__dirname+'public'))
+app.use(express.static(__dirname+'/public'))
+app.set('view engine', 'ejs') 
+
+
 const { MongoClient } = require('mongodb')
 
 let db
@@ -37,6 +40,13 @@ app.get('/list', async(require,response)=>{
     // await 또는 .then(()=>{}) 사용
     let result= await db.collection('post').find().toArray() //모든 결과 출력하기
     //서버에서 console.log 쓰면 터미널에 출력된다
-    console.log(result)
-    response.send('shopping page')
+    
+    //응답은 1번만
+    response.render('list.ejs', { lists: result})
+})
+
+
+app.get('/time', (require,response)=>{
+   let date=new Date()
+   response.render('time.ejs',{time:date})
 })
