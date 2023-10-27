@@ -4,6 +4,9 @@ const app=express()
 
 app.use(express.static(__dirname+'/public'))
 app.set('view engine', 'ejs') 
+// require.body를 해주는 세팅
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
 
 const { MongoClient } = require('mongodb')
@@ -26,15 +29,17 @@ app.listen(8080,()=>{
 
 
 //서버 기능 - 메인페이지 접속 시 hello를 유저에게 보내기
-app.get('/',(require,response)=>{
-    response.sendFile(__dirname+'/index.html')
+app.get('/',(req,res)=>{
+    res.sendFile(__dirname+'/index.html')
 })
 //news 페이지 만들기
-app.get('/news',(require,response)=>{
+app.get('/news',(req,res)=>{
+
+
     db.collection('post').insertOne({title:'가나다'})
     // response.send('sunny day')
 })
-app.get('/list', async(require,response)=>{
+app.get('/list', async(req,res)=>{
     // db.collection은 실행이 오래걸리는 코드라 기다려야 함 
     //만약 비동기로 하지 않는다면 실행이 되기도 전에 다음 줄 출력
     // await 또는 .then(()=>{}) 사용
@@ -42,11 +47,29 @@ app.get('/list', async(require,response)=>{
     //서버에서 console.log 쓰면 터미널에 출력된다
     
     //응답은 1번만
-    response.render('list.ejs', { lists: result})
+    res.render('list.ejs', { lists: result})
 })
 
 
-app.get('/time', (require,response)=>{
+app.get('/time', (req,res)=>{
    let date=new Date()
-   response.render('time.ejs',{time:date})
+   res.render('time.ejs',{time:date})
 })
+
+app.get('/write', (req,res)=>{
+    res.render('write.ejs')
+})
+
+app.post('/add',async(req,res)=>{
+
+// 예외처리 try-catch    
+try{
+    if(!req.body.title){
+        res.send('입력해주세요')
+    } else{ 
+        await db.collection('post').insertOne({title:req.body.title,content:req.body.content})
+         res.redirect('/list')}
+} catch(e){
+    console.log(e)
+    res.status(500).send('서버 에러 ')
+}})
