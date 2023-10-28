@@ -101,9 +101,18 @@ app.get('/edit/:id', async(req,res)=>{
     res.render('edit.ejs',{list:result})
 })
 
-app.post('/edit', async(req,res)=>{ 
-    //req.body : 유저가 input에 입력한 값이 객체로{title:, content:} 들어있음 
-    let result= await db.collection('post').updateOne({_id: new ObjectId(req.body.id)},{$set :{title:req.body.title,content:req.body.content}})
+app.put('/edit', async(req,res)=>{ 
+    await db.collection('post').updateOne({_id: 1},{$inc :{like:1}})
+    // //req.body : 유저가 input에 입력한 값이 객체로{title:, content:} 들어있음 
+    // let result= await db.collection('post').updateOne({_id: new ObjectId(req.body.id)},{$set :{title:req.body.title,content:req.body.content}})
     console.log(req.body)
-    res.redirect('/list')
+    // res.redirect('/list')
+})
+
+
+app.delete('/delete',async(req,res)=>{
+    console.log(req.query.docid)
+    await db.collection('post').deleteOne({_id:new ObjectId(req.query.docid) })
+    //ajax 요청 사용 시 redirect, render 사용 안하는 것이 나음 -> 새로고침이 안되기 때문에
+    res.send('삭제완료')
 })

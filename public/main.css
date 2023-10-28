@@ -18,6 +18,15 @@ font-weight: bold;
 background: #eee;
 }
 
+.title{
+    text-decoration: none;
+    color:black
+}
+.edit,.delete{
+    text-decoration: none;
+    color:orange
+}
+
 .detail-bg {
     background: white;
     padding: 15px;

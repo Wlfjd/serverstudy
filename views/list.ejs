@@ -12,12 +12,23 @@
         <% for (let i=0; i<lists.length; i++) { %>
         <div class="list-box">  
           <h4>
-            <a href="/detail/<%= lists[i]._id%>"><%= lists[i].title %></a>
-            <a href="/edit/<%= lists[i]._id%>">✏</a>
+            <a href="/detail/<%= lists[i]._id%>" class="title"><%= lists[i].title %></a>
+            <a href="/edit/<%= lists[i]._id%>" class="edit">✍</a>
+            <span class="delete" data-id="<%= lists[i]._id%>">❌</span>
           </h4>
           <p><%= lists[i].content %></p>
         </div>
         <% } %>
-        
+      </div>
+      <script>
+    
+        document.querySelectorAll('.delete')[0].addEventListener('click',function(e){
+          //쿼리스트링은 데이터가 노출된다는 단점
+          //url에 id 넣어서 서버로 삭제 요청 
+          fetch('/delete?docid='+ e.target.dataset.id ,{
+            method:'DELETE'
+          })
+        })
+        </script>
 </body>
 </html>
