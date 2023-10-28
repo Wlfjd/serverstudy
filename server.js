@@ -111,8 +111,8 @@ app.put('/edit', async(req,res)=>{
 
 
 app.delete('/delete',async(req,res)=>{
-    console.log(req.query.docid)
-    await db.collection('post').deleteOne({_id:new ObjectId(req.query.docid) })
+    await db.collection('post').deleteOne({ _id: new ObjectId(req.query.docid) })
+    console.log(req.query)
     //ajax 요청 사용 시 redirect, render 사용 안하는 것이 나음 -> 새로고침이 안되기 때문에
     res.send('삭제완료')
 })

@@ -10,11 +10,11 @@
     <%- include('nav.ejs') %>
    <form class="form-box" action="/edit?_method=PUT" method="POST">
     <h4>수정하기</h4>
-    <input name="id" value=<%= list._id%> style="display: none;">
+    <input name="id" value="<%= list._id%>" style="display: none;">
     <label> 제목 </label>
-    <input type="text" name="title" value=<%= list.title%> >
+    <input type="text" name="title" value="<%= list.title%>">
     <label> 내용 </label>
-    <input type="text" name="content" value=<%= list.content%> >
+    <input type="text" name="content" value="<%= list.content%>" >
     <button type="submit">완료</button>
    </form>
         
