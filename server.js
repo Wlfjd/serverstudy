@@ -14,7 +14,19 @@ app.set('view engine', 'ejs')
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+const session=require('express-session')
+const passport=require('passport')
+const LocalStrategy=require('passport-local')
 
+app.use(passport.initialize())
+app.use(session({
+    //세션의 document id는 암호화해서 유저에게 보낸다
+    secret:'암호화에 쓸 비밀번호',
+    resave: false,// 유저가 서버로 요청할 때마다 세션 갱신할지
+    saveUninitialized:false,// 로그인 안해도 세션 만들건지
+    cookie:{maxAge:60*1000} //쿠키 한시간동안 유지-> 1시간 지나면 로그아웃 됨
+}))
+app.use(passport.session())
 
 let db
 const url = 'mongodb+srv://wlfjd:wldnjs813!@cluster0.nohbanp.mongodb.net/?retryWrites=true&w=majority'
@@ -116,3 +128,68 @@ app.delete('/delete',async(req,res)=>{
     //ajax 요청 사용 시 redirect, render 사용 안하는 것이 나음 -> 새로고침이 안되기 때문에
     res.send('삭제완료')
 })
+
+app.get('/list/:id', async(req,res)=>{
+//5개 스킵하고 5개만 가져옴 => 페이지네이션
+    let result= await db.collection('post').find().skip(5*(req.params-1)).limit(5).toArray() //모든 결과 출력하기
+    res.render('list.ejs', { lists: result})
+})
+
+//아이디/비번이 DB와 일치하는지 검증
+passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
+    let result = await db.collection('user').findOne({ username : 입력한아이디})
+    if (!result) {
+        //false : 회원인증 실패
+      return cb(null, false, { message: '아이디 DB에 없음' })
+    }
+    if (result.password == 입력한비번) {
+      return cb(null, result)
+    } else {
+      return cb(null, false, { message: '비번불일치' });
+    }
+  }))
+
+
+  //로그인 시도할 때마다 실행하는코드 -> 로그인 여부 판단
+  passport.serializeUser((user, done) => {
+    console.log(user)
+    // 처리보류(비동기), 가장 오래걸리는 DB 저장
+    process.nextTick(() => {
+        //로그인 시 세션 document 발행해주고, -> 이 id를 쿠키에 적어 보내줌
+      done(null, {id: user._id, username:user.username})
+    })
+  })
+  // 성공적으로 로그인해서 받는 유저 쿠키 분석 -> 세션 데이터랑 비교 -> 이상 없으면 로그인 정보 세팅
+  passport.deserializeUser(async(user, done) => {
+    let result= await db.collection('user').findOne({_id: new ObjectId(user.id)})
+    delete result.password
+    process.nextTick(() => {
+        //로그인 시 세션 document 발행해주고, -> 이 id를 쿠키에 적어 보내줌
+      
+      // return 안하면 쿠키 안남음 
+        return done(null, result)
+    })
+  })
+
+
+app.get('/login', (req,res)=>{
+    console.log(req.user)
+    res.render('login.ejs')
+})
+
+
+
+//로그인 폼 전송 버튼 누르면 post 요청
+app.post('/login', async(req,res,next)=>{
+    passport.authenticate('local', (error,user,info)=>{
+        if(error) return res.status(500).json(error)
+        if(!user) return res.status(401).json(info.message)
+        req.logIn(user,(err)=>{
+            if(err) return next(err)
+             res.redirect('/')
+        })
+    })(req,res,next)
+})
+
+
+
