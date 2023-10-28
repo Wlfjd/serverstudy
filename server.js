@@ -74,20 +74,14 @@ try{
     res.status(500).send('서버 에러 ')
 }})
 
-app.get('/detail/:userparam', (req,res)=>{
+app.get('/detail/:id', async(req,res)=>{
     //<상세페이지 기능>
     //1. 유저가 detail:xx 접속하면( 상세페이지 )
     //2. {id:~} 를 db에서 찾아서
-    //await db.collection('post').insertOne({_id:req.body.title})
-    //let result= await db.collection('post').findOne({_id: new ObjectId(req.params)}) //하나만 찾고싶을때,  find.toArray() 는 전부 다 
-    //console.log(result)
+    let result= await db.collection('post').findOne({_id: new ObjectId(req.params)}) //하나만 찾고싶을때,  find.toArray() 는 전부 다 
+    
     //3. ejs 파일에 박아서 보내준다 
     //let result= await db.collection('post').find().toArray() //모든 결과 출력하기
-    res.render('detail.ejs')
-    console.log(1)
-})
-
-app.get('/detail/:id',(req,res)=>{
-    res.render('detail.ejs')
+    res.render('detail.ejs',{details:result})
 })
 

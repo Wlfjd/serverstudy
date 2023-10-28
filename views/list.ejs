@@ -11,7 +11,7 @@
     <div class="white-bg">
         <% for (let i=0; i<lists.length; i++) { %>
         <div class="list-box">  
-          <h4><%= lists[i].title %></h4>
+          <h4><a href="/detail/<%= lists[i]._id%>"><%= lists[i].title %></a></h4>
           <p><%= lists[i].content %></p>
         </div>
         <% } %>

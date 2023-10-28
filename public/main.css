@@ -9,6 +9,7 @@ background : white;
 }
 .nav a {
 margin-right: 10px;
+text-decoration: none;
 }
 .logo {
 font-weight: bold;
@@ -46,7 +47,7 @@ color: grey;
 input,div {
     box-sizing: border-box;
   }
-  
+
   .form-box {
     background : white;
     padding : 25px;
