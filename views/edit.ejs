@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="/main.css" rel="stylesheet">
+</head>
+<body class="grey-bg">
+    <%- include('nav.ejs') %>
+   <form class="form-box" action="/edit" method="POST">
+    <h4>수정하기</h4>
+    <input name="id" value=<%= list._id%> style="display: none;">
+    <label> 제목 </label>
+    <input type="text" name="title" value=<%= list.title%> >
+    <label> 내용 </label>
+    <input type="text" name="content" value=<%= list.content%> >
+    <button type="submit">완료</button>
+   </form>
+        
+</body>
+</html>

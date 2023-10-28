@@ -1,6 +1,12 @@
 //express 라이브러리 사용법
 const express = require('express')
 const app=express()
+const { MongoClient, ObjectId } = require('mongodb')
+
+//form 태그에서 put,delete 요청하는 방법 (ajax or 라이브러리)
+const methodOverride=require('method-override')
+
+app.use(methodOverride('_method'))
 
 app.use(express.static(__dirname+'/public'))
 app.set('view engine', 'ejs') 
@@ -9,7 +15,6 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
-const { MongoClient, ObjectId } = require('mongodb')
 
 let db
 const url = 'mongodb+srv://wlfjd:wldnjs813!@cluster0.nohbanp.mongodb.net/?retryWrites=true&w=majority'
@@ -61,7 +66,6 @@ app.get('/write', (req,res)=>{
 })
 
 app.post('/add',async(req,res)=>{
-
 // 예외처리 try-catch    
 try{
     if(!req.body.title){
@@ -75,14 +79,13 @@ try{
 }})
 
 app.get('/detail/:id', async(req,res)=>{
-    
     // 없는 id를 입력 시 에러발생, 에러를 방지하기 위한 try,catch 문
     try{
         //<상세페이지 기능>
         //1. 유저가 detail:xx 접속하면( 상세페이지 )
         //2. {id:~} 를 db에서 찾아서
         let result= await db.collection('post').findOne({_id: new ObjectId(req.params.id)}) //하나만 찾고싶을때,  find.toArray() 는 전부 다 
-        console.log(result)
+       
         //3. ejs 파일에 박아서 보내준다 
         //let result= await db.collection('post').find().toArray() //모든 결과 출력하기
         res.render('detail.ejs',{details:result})
@@ -93,3 +96,14 @@ app.get('/detail/:id', async(req,res)=>{
     }
 })
 
+app.get('/edit/:id', async(req,res)=>{
+    let result= await db.collection('post').findOne({_id: new ObjectId(req.params.id)}) 
+    res.render('edit.ejs',{list:result})
+})
+
+app.post('/edit', async(req,res)=>{ 
+    //req.body : 유저가 input에 입력한 값이 객체로{title:, content:} 들어있음 
+    let result= await db.collection('post').updateOne({_id: new ObjectId(req.body.id)},{$set :{title:req.body.title,content:req.body.content}})
+    console.log(req.body)
+    res.redirect('/list')
+})
