@@ -13,10 +13,17 @@ margin-right: 10px;
 .logo {
 font-weight: bold;
 }
-
 .grey-bg {
 background: #eee;
 }
+
+.detail-bg {
+    background: white;
+    padding: 15px;
+    margin-top: 10px;
+  }
+
+
 .white-bg {
 background: white;
 margin: 20px;
@@ -39,6 +46,7 @@ color: grey;
 input,div {
     box-sizing: border-box;
   }
+  
   .form-box {
     background : white;
     padding : 25px;
@@ -59,3 +67,4 @@ input,div {
     background : lightgrey;
     border-radius: 5px;
   }
+
