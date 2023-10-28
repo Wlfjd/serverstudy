@@ -75,13 +75,21 @@ try{
 }})
 
 app.get('/detail/:id', async(req,res)=>{
-    //<상세페이지 기능>
-    //1. 유저가 detail:xx 접속하면( 상세페이지 )
-    //2. {id:~} 를 db에서 찾아서
-    let result= await db.collection('post').findOne({_id: new ObjectId(req.params)}) //하나만 찾고싶을때,  find.toArray() 는 전부 다 
     
-    //3. ejs 파일에 박아서 보내준다 
-    //let result= await db.collection('post').find().toArray() //모든 결과 출력하기
-    res.render('detail.ejs',{details:result})
+    // 없는 id를 입력 시 에러발생, 에러를 방지하기 위한 try,catch 문
+    try{
+        //<상세페이지 기능>
+        //1. 유저가 detail:xx 접속하면( 상세페이지 )
+        //2. {id:~} 를 db에서 찾아서
+        let result= await db.collection('post').findOne({_id: new ObjectId(req.params.id)}) //하나만 찾고싶을때,  find.toArray() 는 전부 다 
+        console.log(result)
+        //3. ejs 파일에 박아서 보내준다 
+        //let result= await db.collection('post').find().toArray() //모든 결과 출력하기
+        res.render('detail.ejs',{details:result})
+
+    }catch(e){
+        console.log(e)
+        res.status(400).send('url 주소가 잘못됨')
+    }
 })
 
