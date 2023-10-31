@@ -21,8 +21,10 @@
         <% } %>
       </div>
       <script>
-          document.querySelectorAll('.delete')[0].addEventListener('click',function(e){
-            fetch('/delete?docid=<%= lists[0]._id%>', {
+        for(let i=0; i<'<%= lists.length %>'; i++){
+          document.querySelectorAll('.delete')[i].addEventListener('click',function(e){
+            
+            fetch('/delete?docid='+e.target.dataset.id, {
               method: 'DELETE',
             })
          .then((r)=>{r.text() })
@@ -33,6 +35,8 @@
            })
           })
      
+
+        }
         </script>
 </body>
 </html>

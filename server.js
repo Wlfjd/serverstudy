@@ -5,6 +5,7 @@ const { MongoClient, ObjectId } = require('mongodb')
 
 //form 태그에서 put,delete 요청하는 방법 (ajax or 라이브러리)
 const methodOverride=require('method-override')
+const bcrypt = require('bcryptjs') 
 
 app.use(methodOverride('_method'))
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({extended:true}))
 const session=require('express-session')
 const passport=require('passport')
 const LocalStrategy=require('passport-local')
+const MongoStore=require('connect-mongo')
 
 app.use(passport.initialize())
 app.use(session({
@@ -24,7 +26,11 @@ app.use(session({
     secret:'암호화에 쓸 비밀번호',
     resave: false,// 유저가 서버로 요청할 때마다 세션 갱신할지
     saveUninitialized:false,// 로그인 안해도 세션 만들건지
-    cookie:{maxAge:60*1000} //쿠키 한시간동안 유지-> 1시간 지나면 로그아웃 됨
+    cookie:{maxAge:60*1000}, //쿠키 한시간동안 유지-> 1시간 지나면 로그아웃 됨
+    store: MongoStore.create({
+        mongoUrl:'mongodb+srv://wlfjd:wldnjs813!@cluster0.nohbanp.mongodb.net/?retryWrites=true&w=majority',
+        dbName:'forum'
+    })
 }))
 app.use(passport.session())
 
@@ -113,12 +119,10 @@ app.get('/edit/:id', async(req,res)=>{
     res.render('edit.ejs',{list:result})
 })
 
-app.put('/edit', async(req,res)=>{ 
-    await db.collection('post').updateOne({_id: 1},{$inc :{like:1}})
+app.put('/edit', async(req,res)=>{
     // //req.body : 유저가 input에 입력한 값이 객체로{title:, content:} 들어있음 
-    // let result= await db.collection('post').updateOne({_id: new ObjectId(req.body.id)},{$set :{title:req.body.title,content:req.body.content}})
-    console.log(req.body)
-    // res.redirect('/list')
+     await db.collection('post').updateOne({_id: new ObjectId(req.body.id)},{$set :{title:req.body.title,content:req.body.content}})
+     res.redirect('/list')
 })
 
 
@@ -140,8 +144,9 @@ passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) =
     let result = await db.collection('user').findOne({ username : 입력한아이디})
     if (!result) {
         //false : 회원인증 실패
-      return cb(null, false, { message: '아이디 DB에 없음' })
+        return cb(null, false, { message: '아이디 DB에 없음' })
     }
+   
     if (result.password == 입력한비번) {
       return cb(null, result)
     } else {
@@ -190,6 +195,25 @@ app.post('/login', async(req,res,next)=>{
         })
     })(req,res,next)
 })
+app.get('/mypage', async(req,res)=>{
+    console.log(req.user)
+    res.render('mypage.ejs')
+})
+app.get('/register', async(req,res)=>{
+    res.render('register.ejs')
+})
+app.post('/register', async(req,res)=>{
+
+    let hash= await bcrypt.hash(req.body.password,10)
+    console.log(hash)
+    
+    await db.collection('user').insertOne({
+        username:req.body.username,
+        password:hash
+    })
+    res.redirect('/')
+})
+
 
 
 
